@@ -1,0 +1,58 @@
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TestApp.Fundamentals;
+
+namespace TestApp.UnitTests
+{
+    [TestFixture]
+    class ErrorLoggerTests
+    {
+        [Test]
+        public void Log_WhenCalled_SetLatErrorProperty()
+        {
+            var logger = new ErrorLogger();
+
+            logger.Log("a");
+
+            Assert.That(logger.LastError, Is.EqualTo("a"));
+        }
+
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        public void Log_InvalidError_ThrowNullArgumentException(string error)
+        {
+            var logger = new ErrorLogger();
+            
+            Assert.That(() => logger.Log(error), Throws.ArgumentNullException);
+            //Assert.That(() => logger.Log(error), Throws.Exception.TypeOf<DivideByZeroException>());
+        }
+        
+        [Test]        
+        public void Log_ValidError_ShouldRaiseLogEvent()
+        {
+            var logger = new ErrorLogger();
+
+            var id = Guid.Empty;
+            logger.ErrorLogged += (sender, args) => { id = args; };
+            logger.Log("a");
+
+            Assert.That(id, Is.Not.EqualTo(Guid.Empty));
+        }
+
+        //[Test]
+        //public void OnErrorLogged_WhenCalled_RaiseEvent()
+        //{
+        //    var logger = new ErrorLogger();
+
+        //    //logger.OnErrorLog();
+
+        //    Assert.That(true);
+        //}
+    }
+}
